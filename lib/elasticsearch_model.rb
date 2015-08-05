@@ -1,3 +1,5 @@
+require "elasticsearch"
+
 class ElasticsearchModel
 	
 	attr_reader :client, :custom_index, :model
