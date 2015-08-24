@@ -7,7 +7,7 @@ class ElasticsearchModel
 	def initialize index_name, model = nil
 		@index_name = index_name
 		config = YAML.load(File.read(Rails.root+"config/elasticsearch.yml"))[Rails.env]
-		@client = Elasticsearch::Client.new host: config["host"]+":"+config["port"].to_s
+		@client = Elasticsearch::Client.new host: config["host"]+":"+config["port"].to_s, request_timeout: config["request_timeout"]
     	custom_name = "lti_"+index_name
     	@model = model
     	@custom_index = {
