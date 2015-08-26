@@ -8,7 +8,7 @@ class ElasticsearchModel
 		@index_name = index_name
 		config = YAML.load(File.read(Rails.root+"config/elasticsearch.yml"))[Rails.env]
 		@client = Elasticsearch::Client.new host: config["host"]+":"+config["port"].to_s, request_timeout: config["request_timeout"]
-    	custom_name = "lti_"+index_name
+    	custom_name = index_name
     	@model = model
     	@custom_index = {
 			name:  custom_name,
@@ -21,10 +21,10 @@ class ElasticsearchModel
 	    @client.bulk body: [create_body(symbolize_keys_deep!( denormalize(data.id) ))]
 	end
 
-	def import_all_to_elastic
-		create_index
+	def import_all_to_elastic create = false		
+		create_index if create
 	    @client.bulk body: denormalize.map{|value| create_body symbolize_keys_deep!(value)}
-	    delete_index
+	    delete_index if create
 	end
 
 	def create_index
@@ -58,7 +58,7 @@ class ElasticsearchModel
     def search *args
     	body = {}
     	args.each do |arg| body.merge! arg end
-      @client.search(index: @custom_index[:read], body: body)["hits"]
+      	@client.search(index: @custom_index[:read], body: body)["hits"]
     end
 
     private
